@@ -13,6 +13,7 @@ import com.cartfy.backend.cartfy_backend.models.requests.LoginUser;
 import com.cartfy.backend.cartfy_backend.models.requests.RecoveryJwtToken;
 import com.cartfy.backend.cartfy_backend.services.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
@@ -24,6 +25,10 @@ public class UserController {
     @GetMapping("/users")
     public String getMethodName() {
         return "OK";
+    }
+    @GetMapping("/users/{teste}")
+    public String teste(@PathVariable int teste) {
+        return "OK " + teste;
     }
     @GetMapping("/users2")
     public String getMethodName2() {

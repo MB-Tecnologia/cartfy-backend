@@ -24,8 +24,10 @@ public class SecurityConfiguration {
         "/api/login", //url que usaremos para fazer login
         "/api/cadastro", //url que usaremos para criar um usuário
         "/swagger-ui/",
-        "swagger-ui/index.html",
-        "/api/users"
+        "/swagger-ui/index.html",
+        "/api/users",
+        "/api/produto/",
+        "/api/produto/**"
     };
 
 
@@ -36,6 +38,7 @@ public class SecurityConfiguration {
                     management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(
                         requests -> requests // Habilita a autorização para as requisições HTTP
                             .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()
+                            .requestMatchers("**/api/produto/**").permitAll()
                             .anyRequest().authenticated()
                     ).addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

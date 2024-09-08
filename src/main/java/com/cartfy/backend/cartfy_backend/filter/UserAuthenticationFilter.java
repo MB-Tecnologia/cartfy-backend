@@ -33,7 +33,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        if (checkIfEndpointIsNotPublic(request)) {
+        if (!checkIfEndpointIsPublic(request)) {
             String token = recoveryToken(request); // Recupera o token do cabeçalho Authorization da requisição
             if (token != null) {
                 String subject = jwtTokenService.getSubjectFromToken(token); // Obtém o assunto (neste caso, o nome de usuário) do token
@@ -54,9 +54,13 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     }
 
         // Verifica se o endpoint requer autenticação antes de processar a requisição
-    private boolean checkIfEndpointIsNotPublic(HttpServletRequest request) {
+    private boolean checkIfEndpointIsPublic(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        return !Arrays.asList(SecurityConfiguration.ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).contains(requestURI);
+
+        if(requestURI.contains("api/produto")){
+            return true;
+        }
+        return Arrays.asList(SecurityConfiguration.ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).contains(requestURI);
     }
 
     // Recupera o token do cabeçalho Authorization da requisição
