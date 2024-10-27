@@ -22,9 +22,20 @@ public class SecurityConfiguration {
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
         "/api/login", //url que usaremos para fazer login
-        "/api/cadastro", //url que usaremos para criar um usuário
-        "/swagger-ui/",
-        "/swagger-ui/index.html",
+        "/api/cadastro", //url que usaremos para criar um usuário        
+        "/api/docs",
+        "/api-docs",
+        "/api/swagger-ui",
+        "/api/swagger-ui/index.html",
+        "/api/swagger-ui/swagger-ui.css",
+        "/api/swagger-ui/index.css",
+        "/api/swagger-ui/swagger-ui-bundle.js",
+        "/api/swagger-ui/swagger-ui-standalone-preset.js",
+        "/api/swagger-ui/swagger-initializer.js",
+        "/api/swagger-ui/favicon-32x32.png",
+        "/api/swagger-ui/favicon-16x16.png",
+        "/api/swagger-ui/**",
+        "/api-docs/swagger-config",
         "/api/users",
         "/api/produto/",
         "/api/produto/**"
