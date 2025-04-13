@@ -12,7 +12,7 @@ public interface ProductListService {
     
     public OperationResponse save(ListProductRequest listProduct);
     public OperationResponse update(long idList, ListProductRequest listProduct);
-    public OperationResponse delete(long idUser, String listName);
+    public OperationResponse delete(long idList);
     public RetrieveResponse<ListProductsResponse> getProductList(long idList);
     public RetrieveResponse<Collection<ListProductsResponse>> getAllProductListByUser(long idUser);
     public RetrieveResponse<Collection<ListProductsResponse>> getProductListByFilter(GetFilterModel filter);    

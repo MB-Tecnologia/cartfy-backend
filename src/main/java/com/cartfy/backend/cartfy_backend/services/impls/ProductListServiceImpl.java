@@ -162,9 +162,14 @@ public class ProductListServiceImpl implements ProductListService{
         }
     }
 
-    public OperationResponse delete(long idUser, String listName){
-        // TODO: implementar delete
-        return null;
+    public OperationResponse delete(long idList){        
+        try {
+            _productListRepo.deleteById(idList);
+            return new OperationResponse(true, "Lista deletada com sucesso");
+        } catch (Exception e) {
+            return new OperationResponse(false, "Erro: " + e.toString());
+        }
+        
     }
     
     public RetrieveResponse<ListProductsResponse> getProductList(long idList){
