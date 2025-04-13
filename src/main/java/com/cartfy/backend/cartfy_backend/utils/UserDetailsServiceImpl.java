@@ -1,7 +1,5 @@
 package com.cartfy.backend.cartfy_backend.utils;
 
-import java.util.function.Supplier;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,8 +11,7 @@ import com.cartfy.backend.cartfy_backend.utils.exceptions.UserNotFoundException;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    
-    private static final Supplier UserNotFound = null;
+        
     @Autowired
     private UserRepository userRepository;
     

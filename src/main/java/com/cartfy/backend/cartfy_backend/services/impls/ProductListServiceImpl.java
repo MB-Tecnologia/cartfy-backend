@@ -16,7 +16,6 @@ import com.cartfy.backend.cartfy_backend.models.requests.ListProductRequest;
 import com.cartfy.backend.cartfy_backend.models.responses.OperationResponse;
 import com.cartfy.backend.cartfy_backend.models.responses.RetrieveResponse;
 import com.cartfy.backend.cartfy_backend.repository.ProductListRepository;
-import com.cartfy.backend.cartfy_backend.repository.UserRepository;
 import com.cartfy.backend.cartfy_backend.services.ProductListService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -43,10 +42,6 @@ public class ProductListServiceImpl implements ProductListService{
     @Autowired
     private ProductListRepository _productListRepo;
 
-    @Autowired
-    private UserRepository _userRepository;
-    // TODO: Validar se usuario existe
-    
     @Value("${URL_DATABASE}")
     private String URL_DATABASE;
     
@@ -275,9 +270,9 @@ public class ProductListServiceImpl implements ProductListService{
                 
                 productsListResponse.add(list);
             } catch (InterruptedException | ExecutionException e) {
-                // TODO Auto-generated catch block
+                // TODO Auto-generated catch block                
                 e.printStackTrace();
-            }     catch (JsonProcessingException e) {
+            } catch (JsonProcessingException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }   
