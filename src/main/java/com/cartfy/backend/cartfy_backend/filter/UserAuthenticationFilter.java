@@ -40,6 +40,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
                 User user = userRepository.findByEmail(subject).get(); // Busca o usuário pelo email (que é o assunto do token)
                 UserDetailsImpl userDetails = new UserDetailsImpl(user); // Cria um UserDetails com o usuário encontrado
 
+                // request.setAttribute("usuario", user);
                 // Cria um objeto de autenticação do Spring Security
                 Authentication authentication =
                         new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());

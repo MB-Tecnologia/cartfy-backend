@@ -1,9 +1,9 @@
 package com.cartfy.backend.cartfy_backend.models.products;
 
-public record ProductResponse(
+public record  ProductResponse(
         String nome,
-        Long gtin,
+        long gtin,
         double preco,
-        String urlImg
+        String urlImg        
         )
 { } 

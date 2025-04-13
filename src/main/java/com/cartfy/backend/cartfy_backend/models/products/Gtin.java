@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class Gtin {
-    Long gtin;
+    long gtin;
     CommercialUnit commercialUnit;
 }

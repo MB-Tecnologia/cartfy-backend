@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 public class ProductCosmos {
     String description;
-    Long gtin;
+    long gtin;
     String thumbnail;
 
     double width;

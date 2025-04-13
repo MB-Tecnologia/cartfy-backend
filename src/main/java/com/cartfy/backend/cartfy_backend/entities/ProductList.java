@@ -1,39 +1,47 @@
 package com.cartfy.backend.cartfy_backend.entities;
 
-import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 @Entity
-@Table(name = "usuario")
+@Table(name = "lista_de_compras")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class User {
+public class ProductList {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
-
-    @Column(unique = true, name = "cpf_cnpj", nullable = false)
-    private String cpfCnpj;
+    @Column(name = "id_lista")
+    private long idLista;
     
-    @Column(unique = true)
-    private String email;
-
-    private String senha;
+    @ManyToOne(targetEntity = User.class)
+    @JoinColumn(name="id_usuario", nullable = false)    
+    private User usuario;
     
+    @Column(name="nome")
+    private String name;
+
+    @Column(name = "url_lista")
+	private String urlLista;
+
     @Column(name = "dt_inclusao")
-    private LocalDateTime  dtInclusao;
+    private String dtIncluso;
 
+    @Column(name = "dt_alteracao")
+    private String dtAlteracao;
 }

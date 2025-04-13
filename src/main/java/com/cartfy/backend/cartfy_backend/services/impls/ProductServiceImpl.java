@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     
     
     @Override
-    public ProductResponse getProductByGtin(Long gtin) {
+    public ProductResponse getProductByGtin(long gtin) {
         try {
             webClient = WebClient.create(URL_PRODUCTS);
             Mono<ProductCosmos> response = webClient.get()
@@ -46,6 +46,7 @@ public class ProductServiceImpl implements ProductService {
 
         return null;
     }
+    
     private ProductResponse mapToProductResponse(ProductCosmos productCosmos){
         return new ProductResponse(productCosmos.getDescription(), productCosmos.getGtin(), productCosmos.getAvg_price(), productCosmos.getThumbnail());
     }

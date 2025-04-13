@@ -6,6 +6,6 @@ import com.cartfy.backend.cartfy_backend.models.products.ProductResponse;
 
 public interface ProductService {
 
-    ProductResponse getProductByGtin(Long gtin);
+    ProductResponse getProductByGtin(long gtin);
     List<ProductResponse> getProductByTerm(String term);
 }

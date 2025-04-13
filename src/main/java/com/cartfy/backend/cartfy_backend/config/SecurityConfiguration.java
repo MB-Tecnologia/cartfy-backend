@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,7 +39,18 @@ public class SecurityConfiguration {
         "/api-docs/swagger-config",
         "/api/users",
         "/api/produto/",
-        "/api/produto/**"
+        "/api/produto/**",
+        "/v2/api-docs/swagger-config",
+        "/swagger-ui/index.html",
+        "/swagger-ui/swagger-ui.css",
+        "/swagger-ui/index.css",
+        "/swagger-ui/swagger-ui-bundle.js",
+        "/swagger-ui/swagger-ui-standalone-preset.js",
+        "/swagger-ui/swagger-initializer.js",
+        "/v3/api-docs/swagger-config",
+        "/swagger-ui/favicon-32x32.png",
+        "/swagger-ui/favicon-16x16.png",
+        "/v3/api-docs",        
     };
 
 
@@ -48,9 +60,11 @@ public class SecurityConfiguration {
                 .sessionManagement(
                     management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(
                         requests -> requests // Habilita a autorização para as requisições HTTP
-                            .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()
-                            .requestMatchers("**/api/produto/**").permitAll()
-                            .anyRequest().authenticated()
+                        .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()
+                        .requestMatchers("**/api/produto/**").permitAll()
+                        .requestMatchers("**/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs*/**").permitAll()
+                        .anyRequest().authenticated()
                     ).addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }    
@@ -62,6 +76,12 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+          .requestMatchers("/swagger-ui/**", "/v3/api-docs*/**");
     }
 
 }
