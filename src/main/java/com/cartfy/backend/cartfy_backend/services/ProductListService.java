@@ -2,9 +2,9 @@ package com.cartfy.backend.cartfy_backend.services;
 
 import java.util.Collection;
 
-import com.cartfy.backend.cartfy_backend.models.listProducts.ListProductsResponse;
 import com.cartfy.backend.cartfy_backend.models.requests.GetFilterModel;
 import com.cartfy.backend.cartfy_backend.models.requests.ListProductRequest;
+import com.cartfy.backend.cartfy_backend.models.responses.ListProductsResponse;
 import com.cartfy.backend.cartfy_backend.models.responses.OperationResponse;
 import com.cartfy.backend.cartfy_backend.models.responses.RetrieveResponse;
 
