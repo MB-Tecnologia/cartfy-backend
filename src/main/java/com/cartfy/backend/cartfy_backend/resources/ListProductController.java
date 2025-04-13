@@ -9,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cartfy.backend.cartfy_backend.models.listProducts.ListProductsResponse;
 import com.cartfy.backend.cartfy_backend.models.requests.GetFilterModel;
 import com.cartfy.backend.cartfy_backend.models.requests.ListProductRequest;
+import com.cartfy.backend.cartfy_backend.models.responses.ListProductsResponse;
 import com.cartfy.backend.cartfy_backend.models.responses.OperationResponse;
 import com.cartfy.backend.cartfy_backend.models.responses.RetrieveResponse;
 import com.cartfy.backend.cartfy_backend.services.ProductListService;
