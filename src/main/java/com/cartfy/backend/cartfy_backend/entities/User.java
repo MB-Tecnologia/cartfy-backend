@@ -32,7 +32,15 @@ public class User {
     private String email;
 
     private String senha;
+
+    @Column(nullable = true)
+    private int telefone;
     
+    private int cep;
+
+    @Column(name = "numero_endereco", nullable = true)
+    private int numeroEndereco;
+
     @Column(name = "dt_inclusao")
     private LocalDateTime  dtInclusao;
 
