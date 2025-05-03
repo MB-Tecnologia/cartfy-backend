@@ -1,6 +1,10 @@
 package com.cartfy.backend.cartfy_backend.config;
 
 import com.cartfy.backend.cartfy_backend.filter.UserAuthenticationFilter;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +18,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -41,8 +48,10 @@ public class SecurityConfiguration {
 
 
     @Bean    
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.csrf(csrf -> csrf.disable()) // Desativa a proteção contra CSRF
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {        
+        return httpSecurity
+            .cors(c -> c.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable()) // Desativa a proteção contra CSRF
                 .sessionManagement(
                     management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(
                         requests -> requests // Habilita a autorização para as requisições HTTP
@@ -68,6 +77,20 @@ public class SecurityConfiguration {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
           .requestMatchers("/swagger-ui/**", "/v3/api-docs*/**");
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+    
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:56126/"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }
