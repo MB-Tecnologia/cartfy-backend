@@ -5,11 +5,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cartfy.backend.cartfy_backend.entities.User;
 import com.cartfy.backend.cartfy_backend.models.requests.CreateUser;
 import com.cartfy.backend.cartfy_backend.models.requests.LoginUser;
 import com.cartfy.backend.cartfy_backend.models.requests.RecoveryJwtToken;
@@ -51,6 +53,20 @@ public class UserController {
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(new OperationResponse(false, "Falha na criação de usuario"));
+        }
+    }
+
+    @GetMapping("/usuario")
+    public ResponseEntity<RetrieveResponse<User>> getByEmail(String email){
+        try {
+            RetrieveResponse<User> resp = userService.getByEmail(email);
+            if(resp.sucess()){
+                return ResponseEntity.ok().body(resp);
+            }
+            return ResponseEntity.badRequest().body(resp);
+            
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new RetrieveResponse<User>(false, e.toString(), null));
         }
     }
 }
