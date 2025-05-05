@@ -15,6 +15,7 @@ import com.cartfy.backend.cartfy_backend.models.requests.CreateUser;
 import com.cartfy.backend.cartfy_backend.models.requests.LoginUser;
 import com.cartfy.backend.cartfy_backend.models.requests.RecoveryJwtToken;
 import com.cartfy.backend.cartfy_backend.models.responses.OperationResponse;
+import com.cartfy.backend.cartfy_backend.models.responses.RetrieveResponse;
 import com.cartfy.backend.cartfy_backend.repository.UserRepository;
 import com.cartfy.backend.cartfy_backend.utils.JwtTokenService;
 import com.cartfy.backend.cartfy_backend.utils.UserDetailsImpl;
@@ -76,5 +77,15 @@ public class UserService {
 
         return new OperationResponse(true, "Usuario cadastrado");
                 
+    }
+
+    public RetrieveResponse<User> getByEmail(String email){
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isPresent()){
+            return new RetrieveResponse<User>(true, email, user);
+        }
+
+        return new RetrieveResponse<User>(false, "Usuario nao encontrado", Optional.empty());
+
     }
 }
