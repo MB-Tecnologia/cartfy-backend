@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -27,7 +28,8 @@ public class ProductServiceImpl implements ProductService {
     }
     
     
-    @Override
+    @Override    
+    @Cacheable("productGtinCache")
     public ProductResponse getProductByGtin(long gtin) {
         try {
             webClient = WebClient.create(URL_PRODUCTS);
@@ -58,9 +60,10 @@ public class ProductServiceImpl implements ProductService {
         }
         return productsResponse;
     }
+
     @Override
-    public List<ProductResponse> getProductByTerm(String term) {
-        // TODO Auto-generated method stub
+    @Cacheable("productTermCache")
+    public List<ProductResponse> getProductByTerm(String term) {        
         try {
             webClient = WebClient.create(URL_PRODUCTS);
             Mono<ListProductCosmos> response = webClient.get()

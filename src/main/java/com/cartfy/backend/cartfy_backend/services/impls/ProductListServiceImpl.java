@@ -163,8 +163,7 @@ public class ProductListServiceImpl implements ProductListService{
             return new OperationResponse(true, "Lista deletada com sucesso");
         } catch (Exception e) {
             return new OperationResponse(false, "Erro: " + e.toString());
-        }
-        
+        }        
     }
     
     public RetrieveResponse<ListProductsResponse> getProductList(long idList){
@@ -211,21 +210,11 @@ public class ProductListServiceImpl implements ProductListService{
             response = client.sendAsync(request, BodyHandlers.ofString()).get();
             HashMap<String,ListProductsResponse > props;
 
-            // src is a File, InputStream, String or such
-            // props = new ObjectMapper().readValue(src, new TypeReference<HashMap<String,Object>>() {});
-            // or:
             var body = response.body();
             if(body.equals("null")){
                 return new RetrieveResponse<Collection<ListProductsResponse>>(false, "A lista nao foi encontrada", null);
             }
-            props = new ObjectMapper().readValue(response.body(), new TypeReference<HashMap<String, ListProductsResponse>>() {});
-            
-            // for (iterable_type iterable_element : props) {
-                
-            // }
-            
-            // var list = mapper.readValue(response.body(), ListProductsResponse.class);
-
+            props = new ObjectMapper().readValue(response.body(), new TypeReference<HashMap<String, ListProductsResponse>>() {});            
             
             return new RetrieveResponse<Collection<ListProductsResponse>>(true, "", Optional.of(props.values()));
         } catch (InterruptedException | ExecutionException e) {            
