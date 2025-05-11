@@ -36,7 +36,7 @@ public class ProductList {
     
     @ManyToOne(targetEntity = User.class)
     @JoinColumn(name="usuario_id", nullable = false)    
-    private User usuario;
+    private User user;
     
     @Column(name="nome")
     private String name;

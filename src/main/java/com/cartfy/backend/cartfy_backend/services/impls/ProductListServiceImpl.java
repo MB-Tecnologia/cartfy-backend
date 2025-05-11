@@ -8,29 +8,24 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.cartfy.backend.cartfy_backend.entities.ProductItem;
 import com.cartfy.backend.cartfy_backend.entities.ProductList;
 import com.cartfy.backend.cartfy_backend.entities.User;
+import com.cartfy.backend.cartfy_backend.models.markets.Markets;
 import com.cartfy.backend.cartfy_backend.models.requests.GetFilterModel;
 import com.cartfy.backend.cartfy_backend.models.requests.ListProductRequest;
 import com.cartfy.backend.cartfy_backend.models.requests.ProductDto;
 import com.cartfy.backend.cartfy_backend.models.responses.ListProductsResponse;
 import com.cartfy.backend.cartfy_backend.models.responses.OperationResponse;
 import com.cartfy.backend.cartfy_backend.models.responses.RetrieveResponse;
+import com.cartfy.backend.cartfy_backend.models.responses.UserListsProductsResponse;
 import com.cartfy.backend.cartfy_backend.repository.ProductListRepository;
 import com.cartfy.backend.cartfy_backend.repository.UserRepository;
 import com.cartfy.backend.cartfy_backend.services.ProductListService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cartfy.backend.cartfy_backend.services.marketService.MarketService;
+import com.cartfy.backend.cartfy_backend.services.marketService.MarketServiceFactory;
 
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.util.concurrent.ExecutionException;
+
 import java.util.Optional;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -42,6 +37,9 @@ public class ProductListServiceImpl implements ProductListService{
 
     @Autowired
     private UserRepository _userRepository;
+
+    @Autowired
+    private MarketServiceFactory _marketServiceFactory;
 
     @Value("${URL_DATABASE}")
     private String URL_DATABASE;
@@ -66,7 +64,7 @@ public class ProductListServiceImpl implements ProductListService{
             
             ProductList list = new ProductList();
             list.setName(listProductRequest.name());
-            list.setUsuario(user);                        
+            list.setUser(user);                        
             
             List<ProductItem> productsDb = mapProductDtoToProductItem(listProductRequest.products(), list);
             list.setProductsItems(productsDb);
@@ -83,7 +81,6 @@ public class ProductListServiceImpl implements ProductListService{
         
     }
             
-
     public OperationResponse update(long idList, ListProductRequest listProductRequest){
         try {
             var productListDb = _productListRepo.findByName(listProductRequest.name());
@@ -118,59 +115,91 @@ public class ProductListServiceImpl implements ProductListService{
             return new OperationResponse(false, "Erro: " + e.toString());
         }        
     }
-    
-    public RetrieveResponse<ListProductsResponse> getProductList(long idList){                
+
+    public RetrieveResponse<ListProductsResponse> getProductList(long idList, Markets market){                
         try {
-            var productListDb = _productListRepo.findById(idList);
-
+            MarketService service = _marketServiceFactory.getService(market);
+            
+            Optional<ProductList> productListDb = _productListRepo.findById(idList);
+            
             if(productListDb.isPresent()){
-                ListProductsResponse  resp = mapProductsItemsToResponse(productListDb.get().getName(), productListDb.get().getProductsItems());
+                
+                String[] gtins = getGtinsByProductList(idList);
+                List<ProductDto> productDtos = service.getProductList(gtins);
 
+                List<ProductItem> productsItems = productListDb.get().getProductsItems();
+
+                for (int i = 0; i < gtins.length; i++) {
+                    productDtos.get(i).setQuantidade(productsItems.get(i).getQuantidade());
+                }
+
+                ListProductsResponse resp = ListProductsResponse.builder()
+                    .name(productListDb.get().getName())
+                    .products(productDtos).build();
+                
                 return new RetrieveResponse<ListProductsResponse >(true, "", Optional.of(resp));
             }
+
         } catch (Exception e) {            
             e.printStackTrace();
         }        
-        return new RetrieveResponse<ListProductsResponse >(false, "Erro na requisicao async", null);        
+        return new RetrieveResponse<ListProductsResponse >(false, "Erro ao montar lista", null);
     }
     
-    public RetrieveResponse<Collection<ListProductsResponse>> getAllProductListByUser(long idUser){        
-        String url = URL_DATABASE + "/" + idUser + ".json";         
+    public RetrieveResponse<List<UserListsProductsResponse>> getAllProductListByUser(long idUser, Markets market){
+        MarketService service = _marketServiceFactory.getService(market);
+        List<ProductList> productLists =  _productListRepo.findByUser_Id(idUser);
 
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))    
-            .GET()    
-            .header("Content-Type", "application/json")        
-            .build();
+        List<UserListsProductsResponse> listsResponse = new ArrayList<>();
 
-        HttpResponse<String> response;
-        try {
-            response = client.sendAsync(request, BodyHandlers.ofString()).get();
-            HashMap<String,ListProductsResponse > props;
+        for (ProductList productList : productLists) {
+            String[] gtins = getGtinsByProductList(productList);
+            List<ProductDto> productDtos = service.getProductList(gtins);
 
-            var body = response.body();
-            if(body.equals("null")){
-                return new RetrieveResponse<Collection<ListProductsResponse>>(false, "A lista nao foi encontrada", null);
+            List<ProductItem> productsItems = productList.getProductsItems();
+
+            double total = 0;
+            for (int i = 0; i < gtins.length; i++) {
+                int quantity = productsItems.get(i).getQuantidade();
+                productDtos.get(i).setQuantidade(quantity);
+                total = productDtos.get(i).getPreco() * quantity;
             }
-            props = new ObjectMapper().readValue(response.body(), new TypeReference<HashMap<String, ListProductsResponse>>() {});            
-            
-            return new RetrieveResponse<Collection<ListProductsResponse>>(true, "", Optional.of(props.values()));
-        } catch (InterruptedException | ExecutionException e) {            
-            e.printStackTrace();
-            return new RetrieveResponse<Collection<ListProductsResponse>>(false, "Erro na requisicao async", null);        
-        } catch (JsonProcessingException e) {            
-            e.printStackTrace();
-            return new RetrieveResponse<Collection<ListProductsResponse>>(false, "Erro no processamento do JSON", null);
-        }        
+
+            var respItem = UserListsProductsResponse.builder()
+                .name(productList.getName())
+                .quantityOfProducts(gtins.length)
+                .total(total).build();
+
+            listsResponse.add(respItem);            
+        }
+
+        return new RetrieveResponse<List<UserListsProductsResponse>>(true, "", Optional.of(listsResponse));
+        // return new RetrieveResponse<Collection<UserListsProductsResponse>>(false, "Erro no processamento do JSON", null);
     }
 
-    public RetrieveResponse<Collection<ListProductsResponse>> getProductListByFilter(GetFilterModel filter){
+    public RetrieveResponse<List<ListProductsResponse>> getProductListByFilter(GetFilterModel filter){
         // TODO implementar metodo no repo para usar o LIKE '%term%' para pesquisar listas
 
-        return new RetrieveResponse<Collection<ListProductsResponse>>(true, "", Optional.of(null));
+        return new RetrieveResponse<List<ListProductsResponse>>(true, "", Optional.of(null));
     }
 
-    private List<ProductItem> mapProductDtoToProductItem(List<ProductDto> productsDto, ProductList productList){
+    
+    public String[] getGtinsByProductList(long idList) {        
+        var productList =_productListRepo.findById(idList);
+        if(productList.isPresent()){
+            return getGtinsByProductList(productList.get());
+
+        }
+
+        return new String[]{};
+    }
+
+    public String[] getGtinsByProductList(ProductList productListDb) {
+
+        return productListDb.getProductsItems().stream().map(item -> item.getGtin()).toArray((String[]::new));
+    }
+
+        private List<ProductItem> mapProductDtoToProductItem(List<ProductDto> productsDto, ProductList productList){
         
         List<ProductItem> productItems = new ArrayList<>();
         for (ProductDto productDto : productsDto) {
@@ -193,9 +222,14 @@ public class ProductListServiceImpl implements ProductListService{
     private ListProductsResponse mapProductsItemsToResponse(String name, List<ProductItem> productsItems){
         
         List<ProductDto> productDtos = new ArrayList<>();
-        for (ProductItem productItem : productsItems) {
-            var p = new ProductDto();
-            
+        for (ProductItem productItem : productsItems) {            
+            var p = ProductDto.builder()
+                    .name(productItem.getName())
+                    .preco(productItem.getPreco())
+                    .quantidade(productItem.getQuantidade())
+                    .urlImg(productItem.getUrlImg())
+                    .gtin(productItem.getGtin()).build();
+
             p.setName(productItem.getName());
             p.setPreco(productItem.getPreco());
             p.setQuantidade(productItem.getQuantidade());
