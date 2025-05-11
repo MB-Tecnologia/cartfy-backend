@@ -6,7 +6,9 @@ import java.util.Optional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cartfy.backend.cartfy_backend.models.markets.Markets;
 import com.cartfy.backend.cartfy_backend.models.products.ProductResponse;
+import com.cartfy.backend.cartfy_backend.models.requests.ProductDto;
 import com.cartfy.backend.cartfy_backend.models.responses.RetrieveResponse;
 import com.cartfy.backend.cartfy_backend.services.ProductService;
 
@@ -24,16 +26,16 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/{gtin}")
-    public ResponseEntity<RetrieveResponse<ProductResponse>> getProductByGtin(@PathVariable long gtin) {
-        var product = productService.getProductByGtin(gtin);
-        return new ResponseEntity<RetrieveResponse<ProductResponse>>(new RetrieveResponse<ProductResponse>(true, "", Optional.of(product)), HttpStatus.OK);
+    public ResponseEntity<RetrieveResponse<ProductDto>> getProductByGtin(@PathVariable long gtin, Markets market) {
+        var product = productService.getProductByGtin(gtin, market);        
+        return new ResponseEntity<RetrieveResponse<ProductDto>>(new RetrieveResponse<ProductDto>(true, "", Optional.of(product)), HttpStatus.OK);
     }
     
     @GetMapping("/descricao/{termo}")
-    public ResponseEntity<RetrieveResponse<List<ProductResponse>>> getProductByTerm(@PathVariable String termo) {
-        var products = productService.getProductByTerm(termo);
+    public ResponseEntity<RetrieveResponse<List<ProductDto>>> getProductByTerm(@PathVariable String termo, Markets market) {
+        var products = productService.getProductByTerm(termo, market);
         
-        return new ResponseEntity<RetrieveResponse<List<ProductResponse>>>(new RetrieveResponse<List<ProductResponse>>(true, "", Optional.of(products)), HttpStatus.OK);
+        return new ResponseEntity<RetrieveResponse<List<ProductDto>>>(new RetrieveResponse<List<ProductDto>>(true, "", Optional.of(products)), HttpStatus.OK);
     }
     
 }

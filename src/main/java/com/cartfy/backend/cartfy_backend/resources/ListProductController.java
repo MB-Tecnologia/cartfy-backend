@@ -1,19 +1,23 @@
 package com.cartfy.backend.cartfy_backend.resources;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cartfy.backend.cartfy_backend.models.markets.Markets;
 import com.cartfy.backend.cartfy_backend.models.requests.GetFilterModel;
 import com.cartfy.backend.cartfy_backend.models.requests.ListProductRequest;
 import com.cartfy.backend.cartfy_backend.models.responses.ListProductsResponse;
 import com.cartfy.backend.cartfy_backend.models.responses.OperationResponse;
 import com.cartfy.backend.cartfy_backend.models.responses.RetrieveResponse;
+import com.cartfy.backend.cartfy_backend.models.responses.UserListsProductsResponse;
 import com.cartfy.backend.cartfy_backend.services.ProductListService;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,9 +36,9 @@ public class ListProductController {
 
 
     @GetMapping("/{idList}")
-    public ResponseEntity<RetrieveResponse<ListProductsResponse >> getByIdList(@PathVariable long idList) {
+    public ResponseEntity<RetrieveResponse<ListProductsResponse>> getByIdList(@PathVariable long idList, @RequestParam Markets market) {
         try{
-            var response = productListService.getProductList(idList);
+            var response = productListService.getProductList(idList, market);
             if(response.sucess()){
                 return ResponseEntity.ok().body(response);
             } else if(response.result() == null){
@@ -50,9 +54,9 @@ public class ListProductController {
     }
 
     @GetMapping("/usuario/{idUser}")
-    public ResponseEntity<RetrieveResponse<Collection<ListProductsResponse>>> getAllByIdUser(@PathVariable long idUser) {
+    public ResponseEntity<RetrieveResponse<List<UserListsProductsResponse>>> getAllByIdUser(@PathVariable long idUser, @RequestParam Markets market) {
         try{
-            var response = productListService.getAllProductListByUser(idUser);
+            var response = productListService.getAllProductListByUser(idUser, market);
             if(response.sucess()){
                 return ResponseEntity.ok().body(response);
             } else if(response.result() == null){
@@ -63,13 +67,13 @@ public class ListProductController {
         } catch (Exception e){
             System.out.println("--------------------------------------------");
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(new RetrieveResponse<Collection<ListProductsResponse>>(false, e.toString(), null));
+            return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(new RetrieveResponse<List<UserListsProductsResponse>>(false, e.toString(), null));
         }
     }
 
 
     @GetMapping("")
-    public ResponseEntity<RetrieveResponse<Collection<ListProductsResponse>>> getByFilter(Optional<String> listName) {
+    public ResponseEntity<RetrieveResponse<List<ListProductsResponse>>> getByFilter(Optional<String> listName) {
         try{
             var filter = new GetFilterModel(listName);
             var response = productListService.getProductListByFilter(filter);
@@ -81,7 +85,7 @@ public class ListProductController {
         } catch (Exception e){
             System.out.println("--------------------------------------------");
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(new RetrieveResponse<Collection<ListProductsResponse>>(false, e.toString(), null));
+            return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(new RetrieveResponse<List<ListProductsResponse>>(false, e.toString(), null));
         }
     }
     
@@ -99,7 +103,7 @@ public class ListProductController {
     @PutMapping("/{idList}")
     public ResponseEntity<OperationResponse> update(@PathVariable long idList, @RequestBody ListProductRequest listProductRequest) {
         var response = productListService.update(idList, listProductRequest);
-// TODO: Testar endpoints
+
         if(response.sucess()){
             return ResponseEntity.ok().body(response);
         }

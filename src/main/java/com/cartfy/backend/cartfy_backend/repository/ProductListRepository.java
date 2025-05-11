@@ -11,4 +11,5 @@ import com.cartfy.backend.cartfy_backend.entities.ProductList;
 public interface ProductListRepository extends JpaRepository<ProductList, Long> {    
     List<ProductList> findByName(String name);
     List<ProductList> findByNameContaining(String term);
+    List<ProductList> findByUser_Id(long idUser);
 }
