@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
@@ -31,7 +32,7 @@ public class ListProductController {
 
 
     @GetMapping("/{idList}")
-    public ResponseEntity<RetrieveResponse<ListProductsResponse>> getByIdList(@PathVariable long idList) {
+    public ResponseEntity<RetrieveResponse<ListProductsResponse >> getByIdList(@PathVariable long idList) {
         try{
             var response = productListService.getProductList(idList);
             if(response.sucess()){
@@ -44,7 +45,7 @@ public class ListProductController {
         } catch (Exception e){
             System.out.println("--------------------------------------------");
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(new RetrieveResponse<ListProductsResponse>(false, e.toString(), null));
+            return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(new RetrieveResponse<ListProductsResponse >(false, e.toString(), null));
         }
     }
 
@@ -106,4 +107,13 @@ public class ListProductController {
         return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(response);
     }
     
+    @DeleteMapping("/{idList}")
+    public ResponseEntity<OperationResponse> delete(@PathVariable long idList){
+        var response = productListService.delete(idList);
+        if(response.sucess()){
+            return ResponseEntity.ok().body(response);
+        }
+        
+        return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(response);
+    }
 }

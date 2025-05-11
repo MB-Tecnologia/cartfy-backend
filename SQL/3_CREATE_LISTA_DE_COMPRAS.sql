@@ -1,11 +1,18 @@
 CREATE TABLE lista_de_compras (
-	id_lista bigint NOT NULL AUTO_INCREMENT,
-    id_usuario int NOT NULL ,
-	nome varchar(50),
-    url_lista varchar(50),    
-    dt_inclusao datetime,
-    dt_alteracao datetime,
-    
-    PRIMARY KEY(id_lista),
-    FOREIGN KEY(id_usuario) REFERENCES usuario(id)
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255) NOT NULL,
+    usuario_id INT,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+);
+
+
+CREATE TABLE produto_item (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255),
+    preco DECIMAL(10,2),
+    url_img VARCHAR(500),
+    gtin VARCHAR(50),
+    quantidade INT,
+    lista_id INT,
+    FOREIGN KEY (lista_id) REFERENCES lista_de_compras(id) ON DELETE CASCADE
 );
