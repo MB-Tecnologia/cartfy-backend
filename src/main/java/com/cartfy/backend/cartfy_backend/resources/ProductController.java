@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cartfy.backend.cartfy_backend.models.markets.Markets;
-import com.cartfy.backend.cartfy_backend.models.products.ProductResponse;
 import com.cartfy.backend.cartfy_backend.models.requests.ProductDto;
 import com.cartfy.backend.cartfy_backend.models.responses.RetrieveResponse;
 import com.cartfy.backend.cartfy_backend.services.ProductService;

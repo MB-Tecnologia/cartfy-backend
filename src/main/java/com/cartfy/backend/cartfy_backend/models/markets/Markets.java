@@ -2,7 +2,8 @@ package com.cartfy.backend.cartfy_backend.models.markets;
 
 public enum Markets {
     COSMOS(1),
-    ATACADAO(2);
+    ATACADAO(2),
+    PAODEACUCAR(3);
 
     private int value;
     Markets(int i) {

@@ -25,8 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @Component
-@MarketServiceType(Markets.ATACADAO)
-public class AtacadaoService implements MarketService{
+@MarketServiceType(Markets.PAODEACUCAR)
+public class PaoDeAcucarService implements MarketService{
 
     private String URL_DATABASE = "http://localhost:8000/mercado";
 
@@ -37,7 +37,7 @@ public class AtacadaoService implements MarketService{
 
     ObjectMapper mapper;
 
-    public AtacadaoService(){
+    public PaoDeAcucarService(){
         webClient = WebClient.create(URL_DATABASE);
         client = HttpClient.newBuilder().build();
 
@@ -45,10 +45,10 @@ public class AtacadaoService implements MarketService{
     }
 
     @Override
-    @Cacheable(value = "getProductListMarket")    
+    @Cacheable(value = "getProductListMarket")
     public List<ProductDto> getProductList(List<ProductItem> productsItems) {
 
-        ExtractorRequest requestBody = new ExtractorRequest(productsItems.stream().map(p -> p.getGtin()).toArray(String[]::new), Markets.ATACADAO.getValue(), CEP);
+        ExtractorRequest requestBody = new ExtractorRequest(productsItems.stream().map(p -> p.getGtin()).toArray(String[]::new), Markets.PAODEACUCAR.getValue(), CEP);
                         
         String requestStr;
 
@@ -131,5 +131,5 @@ public class AtacadaoService implements MarketService{
                     .gtin(String.valueOf(gtin)).build();
 
     }
-
+    
 }

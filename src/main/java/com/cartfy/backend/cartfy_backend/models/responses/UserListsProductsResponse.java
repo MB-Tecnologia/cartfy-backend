@@ -10,6 +10,9 @@ import lombok.Builder;
 @JsonSerialize
 @Builder
 public class UserListsProductsResponse {
+    @JsonProperty("idList")
+    long idList;
+    
     @JsonProperty("name")
     String name;
 

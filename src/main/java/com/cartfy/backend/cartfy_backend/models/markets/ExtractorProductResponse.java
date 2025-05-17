@@ -1,9 +1,9 @@
-package com.cartfy.backend.cartfy_backend.models.markets.atacadao;
+package com.cartfy.backend.cartfy_backend.models.markets;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize
-public record AtacadaoProductResponse(
+public record ExtractorProductResponse(
     String nome,    
     long gtin,
     double preco,
