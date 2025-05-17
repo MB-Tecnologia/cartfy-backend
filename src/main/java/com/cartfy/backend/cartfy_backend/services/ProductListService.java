@@ -2,6 +2,7 @@ package com.cartfy.backend.cartfy_backend.services;
 
 import java.util.List;
 
+import com.cartfy.backend.cartfy_backend.entities.ProductItem;
 import com.cartfy.backend.cartfy_backend.models.markets.Markets;
 import com.cartfy.backend.cartfy_backend.models.requests.GetFilterModel;
 import com.cartfy.backend.cartfy_backend.models.requests.ListProductRequest;
@@ -19,5 +20,6 @@ public interface ProductListService {
     public RetrieveResponse<List<UserListsProductsResponse>> getAllProductListByUser(long idUser, Markets market);
     public RetrieveResponse<List<ListProductsResponse>> getProductListByFilter(GetFilterModel filter);
 
-    public String[] getGtinsByProductList(long idList);
+    public List<ProductItem> getProductsItemsById(long idList);    
+
 }

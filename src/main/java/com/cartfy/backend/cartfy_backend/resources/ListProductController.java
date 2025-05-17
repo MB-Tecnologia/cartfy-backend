@@ -1,6 +1,5 @@
 package com.cartfy.backend.cartfy_backend.resources;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 

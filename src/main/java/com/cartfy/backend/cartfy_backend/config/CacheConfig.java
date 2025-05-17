@@ -13,7 +13,7 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {    
-        CaffeineCacheManager manager = new CaffeineCacheManager("productGtinCache", "productTermCache");
+        CaffeineCacheManager manager = new CaffeineCacheManager();
         manager.setCaffeine(
             Caffeine.newBuilder()
             .expireAfterWrite(12, TimeUnit.HOURS)

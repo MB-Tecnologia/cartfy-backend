@@ -2,6 +2,8 @@ package com.cartfy.backend.cartfy_backend.services.impls;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -45,7 +47,7 @@ public class ProductListServiceImpl implements ProductListService{
     private String URL_DATABASE;
     
     WebClient webClient;
-    HttpClient client;
+    HttpClient client;    
 
     public ProductListServiceImpl() {
         webClient = WebClient.create(URL_DATABASE);
@@ -53,6 +55,7 @@ public class ProductListServiceImpl implements ProductListService{
         client = HttpClient.newBuilder().build();
     }
 
+    @CacheEvict(value = "getAllProductListByUser")
     public OperationResponse save(ListProductRequest listProductRequest){
         try {
             var productListDb = _productListRepo.findByName(listProductRequest.name());
@@ -67,6 +70,7 @@ public class ProductListServiceImpl implements ProductListService{
             list.setUser(user);                        
             
             List<ProductItem> productsDb = mapProductDtoToProductItem(listProductRequest.products(), list);
+
             list.setProductsItems(productsDb);
                             
             _productListRepo.save(list);
@@ -81,6 +85,7 @@ public class ProductListServiceImpl implements ProductListService{
         
     }
             
+    @CacheEvict(value = "getAllProductListByUser")
     public OperationResponse update(long idList, ListProductRequest listProductRequest){
         try {
             var productListDb = _productListRepo.findByName(listProductRequest.name());
@@ -107,6 +112,7 @@ public class ProductListServiceImpl implements ProductListService{
         }
     }
 
+    @CacheEvict(value = "getAllProductListByUser")
     public OperationResponse delete(long idList){        
         try {
             _productListRepo.deleteById(idList);
@@ -116,20 +122,19 @@ public class ProductListServiceImpl implements ProductListService{
         }        
     }
 
+    @Cacheable(value = "getProductList")  
     public RetrieveResponse<ListProductsResponse> getProductList(long idList, Markets market){                
         try {
             MarketService service = _marketServiceFactory.getService(market);
             
             Optional<ProductList> productListDb = _productListRepo.findById(idList);
             
-            if(productListDb.isPresent()){
-                
-                String[] gtins = getGtinsByProductList(idList);
-                List<ProductDto> productDtos = service.getProductList(gtins);
-
+            if(productListDb.isPresent()){                                
                 List<ProductItem> productsItems = productListDb.get().getProductsItems();
+                List<ProductDto> productDtos = service.getProductList(productsItems);
 
-                for (int i = 0; i < gtins.length; i++) {
+
+                for (int i = 0; i < productsItems.size(); i++) {
                     productDtos.get(i).setQuantidade(productsItems.get(i).getQuantidade());
                 }
 
@@ -146,6 +151,7 @@ public class ProductListServiceImpl implements ProductListService{
         return new RetrieveResponse<ListProductsResponse >(false, "Erro ao montar lista", null);
     }
     
+    @Cacheable(value = "getAllProductListByUser")
     public RetrieveResponse<List<UserListsProductsResponse>> getAllProductListByUser(long idUser, Markets market){
         MarketService service = _marketServiceFactory.getService(market);
         List<ProductList> productLists =  _productListRepo.findByUser_Id(idUser);
@@ -153,21 +159,20 @@ public class ProductListServiceImpl implements ProductListService{
         List<UserListsProductsResponse> listsResponse = new ArrayList<>();
 
         for (ProductList productList : productLists) {
-            String[] gtins = getGtinsByProductList(productList);
-            List<ProductDto> productDtos = service.getProductList(gtins);
-
-            List<ProductItem> productsItems = productList.getProductsItems();
+            List<ProductItem> productsItems = productList.getProductsItems();            
+            List<ProductDto> productDtos = service.getProductList(productsItems);
 
             double total = 0;
-            for (int i = 0; i < gtins.length; i++) {
+            for (int i = 0; i < productsItems.size(); i++) {
                 int quantity = productsItems.get(i).getQuantidade();
                 productDtos.get(i).setQuantidade(quantity);
                 total = productDtos.get(i).getPreco() * quantity;
             }
 
             var respItem = UserListsProductsResponse.builder()
+                .idList(productList.getIdLista())
                 .name(productList.getName())
-                .quantityOfProducts(gtins.length)
+                .quantityOfProducts(productsItems.size())
                 .total(total).build();
 
             listsResponse.add(respItem);            
@@ -184,22 +189,19 @@ public class ProductListServiceImpl implements ProductListService{
     }
 
     
-    public String[] getGtinsByProductList(long idList) {        
+    public List<ProductItem> getProductsItemsById(long idList) {
         var productList =_productListRepo.findById(idList);
         if(productList.isPresent()){
-            return getGtinsByProductList(productList.get());
-
+            return productList.get().getProductsItems();
+    
         }
-
-        return new String[]{};
+    
+        return new ArrayList<ProductItem>();
+        
     }
 
-    public String[] getGtinsByProductList(ProductList productListDb) {
 
-        return productListDb.getProductsItems().stream().map(item -> item.getGtin()).toArray((String[]::new));
-    }
-
-        private List<ProductItem> mapProductDtoToProductItem(List<ProductDto> productsDto, ProductList productList){
+    private List<ProductItem> mapProductDtoToProductItem(List<ProductDto> productsDto, ProductList productList){
         
         List<ProductItem> productItems = new ArrayList<>();
         for (ProductDto productDto : productsDto) {
@@ -218,28 +220,5 @@ public class ProductListServiceImpl implements ProductListService{
 
         return productItems;
     }
-    
-    private ListProductsResponse mapProductsItemsToResponse(String name, List<ProductItem> productsItems){
         
-        List<ProductDto> productDtos = new ArrayList<>();
-        for (ProductItem productItem : productsItems) {            
-            var p = ProductDto.builder()
-                    .name(productItem.getName())
-                    .preco(productItem.getPreco())
-                    .quantidade(productItem.getQuantidade())
-                    .urlImg(productItem.getUrlImg())
-                    .gtin(productItem.getGtin()).build();
-
-            p.setName(productItem.getName());
-            p.setPreco(productItem.getPreco());
-            p.setQuantidade(productItem.getQuantidade());
-            p.setUrlImg(productItem.getUrlImg());        
-            p.setGtin(productItem.getGtin());               
-            
-            productDtos.add(p);
-
-        }
-
-        return ListProductsResponse.builder().name(name).products(productDtos).build();        
-    }
 }

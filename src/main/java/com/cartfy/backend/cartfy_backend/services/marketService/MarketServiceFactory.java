@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,9 @@ public class MarketServiceFactory {
 
     @Autowired
     public MarketServiceFactory(List<MarketService> servicos) {
-        for (MarketService servico : servicos) {
-            MarketServiceType anotacao = servico.getClass().getAnnotation(MarketServiceType.class);
+        for (MarketService servico : servicos) {            
+            Class<?> targetClass = AopProxyUtils.ultimateTargetClass(servico);
+            MarketServiceType anotacao = targetClass.getAnnotation(MarketServiceType.class);
             if (anotacao != null) {
                 mapaServicos.put(anotacao.value(), servico);
             }
