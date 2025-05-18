@@ -45,7 +45,7 @@ public class PaoDeAcucarService implements MarketService{
     }
 
     @Override
-    @Cacheable(value = "getProductListMarket")
+    @Cacheable(value = "getProductListMarket", keyGenerator = "productItemKeyGenerator")
     public List<ProductDto> getProductList(List<ProductItem> productsItems) {
 
         ExtractorRequest requestBody = new ExtractorRequest(productsItems.stream().map(p -> p.getGtin()).toArray(String[]::new), Markets.PAODEACUCAR.getValue(), CEP);

@@ -40,7 +40,7 @@ public class CosmosService implements MarketService{
     }
 
     @Override
-    @Cacheable(value = "getProductListMarket")  
+    @Cacheable(value = "getProductListMarket", keyGenerator = "productItemKeyGenerator")
     public List<ProductDto> getProductList(List<ProductItem> productsItems) {                                              
         List<ProductDto> list = new ArrayList<>();
 
