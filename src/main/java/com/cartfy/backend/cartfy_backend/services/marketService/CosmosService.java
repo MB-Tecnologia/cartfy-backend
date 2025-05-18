@@ -47,12 +47,7 @@ public class CosmosService implements MarketService{
         for (ProductItem productItem : productsItems) {
             ProductDto product = getProductByGtin(productItem.getGtin());
             if(product == null){
-                list.add(ProductDto.builder()
-                    .name("")
-                    .preco(0)
-                    .quantidade(0)
-                    .urlImg("")
-                    .gtin(String.valueOf(productItem)).build());
+                list.add(new ProductDto());
             }
             list.add(product);
         } 
@@ -80,12 +75,13 @@ public class CosmosService implements MarketService{
     }        
     
     private ProductDto mapToProductDto(ProductCosmos productCosmos){
-        return ProductDto.builder()
-                    .name(productCosmos.getDescription())
-                    .preco(productCosmos.getAvg_price())
-                    .quantidade(1)
-                    .urlImg(productCosmos.getThumbnail())
-                    .gtin(String.valueOf(productCosmos.getGtin())).build();        
+        return new ProductDto();        
+    }
+
+    @Override
+    public List<ProductDto> getProductByTerm(String term) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getProductByTerm'");
     }
 
 }

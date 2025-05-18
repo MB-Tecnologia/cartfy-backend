@@ -122,7 +122,7 @@ public class ProductListServiceImpl implements ProductListService{
         }        
     }
 
-    @Cacheable(value = "getProductList")  
+    // @Cacheable(value = "getProductList")  
     public RetrieveResponse<ListProductsResponse> getProductList(long idList, Markets market){                
         try {
             MarketService service = _marketServiceFactory.getService(market);
@@ -151,7 +151,7 @@ public class ProductListServiceImpl implements ProductListService{
         return new RetrieveResponse<ListProductsResponse >(false, "Erro ao montar lista", null);
     }
     
-    @Cacheable(value = "getAllProductListByUser")
+    // @Cacheable(value = "getAllProductListByUser")
     public RetrieveResponse<List<UserListsProductsResponse>> getAllProductListByUser(long idUser, Markets market){
         MarketService service = _marketServiceFactory.getService(market);
         List<ProductList> productLists =  _productListRepo.findByUser_Id(idUser);
@@ -207,7 +207,7 @@ public class ProductListServiceImpl implements ProductListService{
         for (ProductDto productDto : productsDto) {
             var p = new ProductItem();
 
-            p.setName(productDto.getName());
+            p.setName(productDto.getNome());
             p.setPreco(productDto.getPreco());
             p.setQuantidade(productDto.getQuantidade());
             p.setUrlImg(productDto.getUrlImg());

@@ -26,9 +26,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
 @Component
-@MarketServiceType(Markets.PAODEACUCAR)
-public class PaoDeAcucarService implements MarketService {
+@MarketServiceType(Markets.EXTRA)
+public class ExtraService implements MarketService{
 
     private String URL_DATABASE = "http://localhost:8000";
 
@@ -39,8 +40,8 @@ public class PaoDeAcucarService implements MarketService {
 
     ObjectMapper mapper;
 
-    public PaoDeAcucarService() {
-        webClient = WebClient.create(URL_DATABASE + "/mercado");
+    public ExtraService(){
+        webClient = WebClient.create(URL_DATABASE);
         client = HttpClient.newBuilder().build();
 
         mapper = new ObjectMapper();
@@ -50,26 +51,25 @@ public class PaoDeAcucarService implements MarketService {
     // @Cacheable(value = "getProductListMarket", keyGenerator = "productItemKeyGenerator")
     public List<ProductDto> getProductList(List<ProductItem> productsItems) {
 
-        ExtractorRequest requestBody = new ExtractorRequest(
-                productsItems.stream().map(p -> p.getGtin()).toArray(String[]::new), Markets.PAODEACUCAR.getValue(),
-                CEP);
-
+        ExtractorRequest requestBody = new ExtractorRequest(productsItems.stream().map(p -> p.getGtin()).toArray(String[]::new), Markets.EXTRA.getValue(), CEP);
+                        
         String requestStr;
 
         List<ProductDto> list = new ArrayList<>();
         try {
             requestStr = mapper.writeValueAsString(requestBody);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(URL_DATABASE + "/mercado"))
-                    .POST(BodyPublishers.ofString(requestStr))
-                    .header("Content-Type", "application/json")
+                    .uri(URI.create(URL_DATABASE + "/mercado"))    
+                    .POST(BodyPublishers.ofString(requestStr))    
+                    .header("Content-Type", "application/json")        
                     .build();
-
+                                
             HttpResponse<String> response = client.sendAsync(request, BodyHandlers.ofString()).get();
 
-            ProductDto[] resposta = mapper.readValue(response.body(), ProductDto[].class);
+            ProductDto[] resposta = mapper.readValue(response.body(), ProductDto[].class);        
 
             return Arrays.asList(resposta);
+            
         }
 
         catch (InterruptedException e) {
@@ -78,52 +78,55 @@ public class PaoDeAcucarService implements MarketService {
         } catch (ExecutionException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
+        catch (JsonProcessingException e) {
+        // TODO Auto-generated catch block
+            e.printStackTrace();
+        }    
 
         return list;
-
+        
     }
 
-    @Cacheable(value = "getProductByGtinPao")
     @Override
-    public ProductDto getProductByGtin(String gtin) {
-        
+    @Cacheable(value = "getProductByGtinExtras")
+    public ProductDto getProductByGtin(String gtin) {                  
         try {
             URI uri = new URIBuilder(URL_DATABASE + "/produto/" + gtin)
             .addParameter("cep", "06433220")
-            .addParameter("market", String.valueOf(Markets.PAODEACUCAR.getValue()))
-            .build();            
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(uri)
-                    .GET()
-                    .header("Content-Type", "application/json")
-                    .build();
+            .addParameter("market", String.valueOf(Markets.EXTRA.getValue()))
+            .build();
 
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(uri)    
+                    .GET()
+                    .build();
+                                
             HttpResponse<String> response = client.sendAsync(request, BodyHandlers.ofString()).get();
 
-            ProductDto resposta = mapper.readValue(response.body(), ProductDto.class);
-
-            if (resposta != null) {
-                return resposta;
+            if(response.statusCode() == 200){
+                ProductDto resposta = mapper.readValue(response.body(), ProductDto.class);        
+    
+                if (resposta != null) {
+                    return resposta;                    
+                }            
 
             }
 
-        } catch (Exception e) {
+            
+        } catch(Exception e){
             e.printStackTrace();
         }
 
         return new ProductDto();
 
     }
-
+    
     public List<ProductDto> getProductByTerm(String term){
-        try {
+                try {
             URI uri = new URIBuilder(URL_DATABASE + "/produto")
             .addParameter("cep", "06433220")
-            .addParameter("market", String.valueOf(Markets.PAODEACUCAR.getValue()))
+            .addParameter("market", String.valueOf(Markets.EXTRA.getValue()))
             .addParameter("term", term).build();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
