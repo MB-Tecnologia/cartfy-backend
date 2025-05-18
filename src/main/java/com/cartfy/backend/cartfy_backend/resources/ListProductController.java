@@ -37,7 +37,7 @@ public class ListProductController {
     @GetMapping("/{idList}")
     public ResponseEntity<RetrieveResponse<ListProductsResponse>> getByIdList(@PathVariable long idList, @RequestParam Markets market) {
         try{
-            var response = productListService.getProductList(idList, market);
+            RetrieveResponse<ListProductsResponse> response = productListService.getProductList(idList, market);
             if(response.sucess()){
                 return ResponseEntity.ok().body(response);
             } else if(response.result() == null){
