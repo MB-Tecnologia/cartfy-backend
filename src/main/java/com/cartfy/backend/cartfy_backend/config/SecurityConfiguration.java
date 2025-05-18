@@ -3,7 +3,6 @@ package com.cartfy.backend.cartfy_backend.config;
 import com.cartfy.backend.cartfy_backend.filter.UserAuthenticationFilter;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -83,7 +82,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
     
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:56126/"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:58919/"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
